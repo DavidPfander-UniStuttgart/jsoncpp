@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Token.hpp"
+#include "token.hpp"
 
 #include <exception>
 #include <string>
@@ -17,7 +17,7 @@ private:
   std::string message;
 
 public:
-  json_exception(Token &token, const std::string &message);
+  json_exception(token &t, const std::string &message);
 
   explicit json_exception(const std::string &message);
 

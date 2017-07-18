@@ -3,8 +3,8 @@
 // use, please see the copyright notice provided with SG++ or at
 // sgpp.sparsegrids.org
 
-#include "TextNode.hpp"
 #include "json_exception.hpp"
+#include "text_node.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -13,18 +13,18 @@
 
 namespace json {
 
-TextNode::TextNode()
+text_node::text_node()
     : value(), isDouble(false), doubleValue(0.0), isUnsigned(false),
       unsignedValue(0), isSigned(false), signedValue(0), isBool(false),
       boolValue(false) {}
 
-Node &TextNode::operator=(const Node &right) {
-  const TextNode &textNode = dynamic_cast<const TextNode &>(right);
+node &text_node::operator=(const node &right) {
+  const text_node &textNode = dynamic_cast<const text_node &>(right);
   this->operator=(textNode);
   return *this;
 }
 
-void TextNode::setupInternalType() {
+void text_node::setupInternalType() {
   //    this->internalType = InternalIDType::ID;
 
   // try validating as bool
@@ -113,9 +113,9 @@ void TextNode::setupInternalType() {
   }
 }
 
-void TextNode::parse(std::vector<Token> &stream) {
+void text_node::parse(std::vector<token> &stream) {
   // create new text node
-  if (stream[0].type == TokenType::STRING) {
+  if (stream[0].type == token_type::STRING) {
     this->value = stream[0].value;
     stream.erase(stream.begin());
 
@@ -125,18 +125,18 @@ void TextNode::parse(std::vector<Token> &stream) {
   }
 }
 
-void TextNode::serialize(std::ostream &outFile, size_t indentWidth) {
+void text_node::serialize(std::ostream &outFile, size_t indentWidth) {
   outFile << "\"" << this->value << "\"";
 }
 
-std::string &TextNode::get() { return this->value; }
+std::string &text_node::get() { return this->value; }
 
-void TextNode::set(const std::string &value) {
+void text_node::set(const std::string &value) {
   this->value = value;
   this->setupInternalType();
 }
 
-double TextNode::getDouble() {
+double text_node::getDouble() {
   //    if (this->internalType == InternalIDType::DOUBLE) {
   if (this->isDouble) {
     return this->doubleValue;
@@ -145,7 +145,7 @@ double TextNode::getDouble() {
   }
 }
 
-void TextNode::setDouble(double numericValue) {
+void text_node::setDouble(double numericValue) {
   //    this->doubleValue = numericValue;
   //    this->internalType = InternalIDType::DOUBLE;
   std::stringstream stringstream;
@@ -154,7 +154,7 @@ void TextNode::setDouble(double numericValue) {
   this->setupInternalType();
 }
 
-uint64_t TextNode::getUInt() {
+uint64_t text_node::getUInt() {
   //    if (this->internalType == InternalIDType::UINT) {
   if (this->isUnsigned) {
     return this->unsignedValue;
@@ -163,7 +163,7 @@ uint64_t TextNode::getUInt() {
   }
 }
 
-void TextNode::setUInt(uint64_t uintValue) {
+void text_node::setUInt(uint64_t uintValue) {
   //    this->unsignedValue = uintValue;
   //    this->internalType = InternalIDType::UINT;
   std::stringstream stringstream;
@@ -172,7 +172,7 @@ void TextNode::setUInt(uint64_t uintValue) {
   this->setupInternalType();
 }
 
-int64_t TextNode::getInt() {
+int64_t text_node::getInt() {
   //    if (this->internalType == InternalIDType::INT) {
   if (this->isSigned) {
     return this->signedValue;
@@ -181,7 +181,7 @@ int64_t TextNode::getInt() {
   }
 }
 
-void TextNode::setInt(int64_t intValue) {
+void text_node::setInt(int64_t intValue) {
   //    this->unsignedValue = intValue;
   //    this->internalType = InternalIDType::INT;
   std::stringstream stringstream;
@@ -190,7 +190,7 @@ void TextNode::setInt(int64_t intValue) {
   this->setupInternalType();
 }
 
-bool TextNode::getBool() {
+bool text_node::getBool() {
   //    if (this->internalType == InternalIDType::BOOL) {
   if (this->isBool) {
     return this->boolValue;
@@ -199,7 +199,7 @@ bool TextNode::getBool() {
   }
 }
 
-void TextNode::setBool(bool boolValue) {
+void text_node::setBool(bool boolValue) {
   //    this->boolValue = boolValue;
   //    this->internalType = InternalIDType::BOOL;
   if (boolValue) {
@@ -211,10 +211,10 @@ void TextNode::setBool(bool boolValue) {
   this->setupInternalType();
 }
 
-size_t TextNode::size() { return 1; }
+size_t text_node::size() { return 1; }
 
-Node *TextNode::clone() {
-  TextNode *newNode = new TextNode(*this);
+node *text_node::clone() {
+  text_node *newNode = new text_node(*this);
   return newNode;
 }
 

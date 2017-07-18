@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Node.hpp"
+#include "node.hpp"
 
 #include <map>
 #include <memory>
@@ -14,78 +14,78 @@
 
 namespace json {
 
-class DictNode : public Node {
+class dict_node : public node {
 protected:
-  std::map<std::string, std::unique_ptr<Node>> attributes;
+  std::map<std::string, std::unique_ptr<node>> attributes;
 
   std::vector<std::string> keyOrder;
 
 public:
-  DictNode();
+  dict_node();
 
-  DictNode(const DictNode &original);
+  dict_node(const dict_node &original);
 
-  DictNode &operator=(const DictNode &right);
+  dict_node &operator=(const dict_node &right);
 
-  Node &operator=(const Node &right) override;
+  node &operator=(const node &right) override;
 
-  void parse(std::vector<Token> &stream) override;
+  void parse(std::vector<token> &stream) override;
 
-  void parseAttributes(std::vector<Token> &stream);
+  void parseAttributes(std::vector<token> &stream);
 
   void serialize(std::ostream &outFile, size_t indentWidth) override;
 
-  Node &operator[](const std::string &key) override;
+  node &operator[](const std::string &key) override;
 
   size_t size() override;
 
-  Node *clone() override;
+  node *clone() override;
 
   void addAttribute(const std::string &name,
-                    std::unique_ptr<Node> node) override;
+                    std::unique_ptr<node> node) override;
 
-  std::unique_ptr<Node> removeAttribute(const std::string name) override;
-
-  // returns the node to which the attribute was added
-  Node &addTextAttr(const std::string &name, const std::string &value) override;
+  std::unique_ptr<node> removeAttribute(const std::string name) override;
 
   // returns the node to which the attribute was added
-  Node &addIDAttr(const std::string &name, const std::string &value) override;
+  node &addTextAttr(const std::string &name, const std::string &value) override;
+
+  // returns the node to which the attribute was added
+  node &addIDAttr(const std::string &name, const std::string &value) override;
 
   // returns the node to which the attribute was added
   // cast internally to string, prevents the boolean overload from being used,
   // if the value is a
   // string literal
-  Node &addIDAttr(const std::string &name, const char *value) override;
+  node &addIDAttr(const std::string &name, const char *value) override;
 
   // returns the node to which the attribute was added
-  Node &addIDAttr(const std::string &name, const double &value) override;
+  node &addIDAttr(const std::string &name, const double &value) override;
 
   // returns the node to which the attribute was added
-  Node &addIDAttr(const std::string &name, const uint64_t &value) override;
+  node &addIDAttr(const std::string &name, const uint64_t &value) override;
 
   // returns the node to which the attribute was added
-  Node &addIDAttr(const std::string &name, const int64_t &value) override;
+  node &addIDAttr(const std::string &name, const int64_t &value) override;
 
   // returns the node to which the attribute was added
-  Node &addIDAttr(const std::string &name, const bool &value) override;
+  node &addIDAttr(const std::string &name, const bool &value) override;
 
   // returns created dict node
-  Node &addDictAttr(const std::string &name) override;
+  node &addDictAttr(const std::string &name) override;
 
   // returns created list node
-  Node &addListAttr(const std::string &name) override;
+  node &addListAttr(const std::string &name) override;
 
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist,
   // the old node is deleted
-  Node &replaceTextAttr(const std::string &name,
+  node &replaceTextAttr(const std::string &name,
                         const std::string &value) override;
 
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist,
   // the old node is deleted
-  Node &replaceIDAttr(const std::string &name,
+  node &replaceIDAttr(const std::string &name,
                       const std::string &value) override;
 
   // returns the node to which the attribute was added
@@ -94,41 +94,41 @@ public:
   // cast internally to string, prevents the boolean overload from being used,
   // if the value is a
   // string literal
-  Node &replaceIDAttr(const std::string &name, const char *value) override;
+  node &replaceIDAttr(const std::string &name, const char *value) override;
 
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist,
   // the old node is deleted
-  Node &replaceIDAttr(const std::string &name, const double &value) override;
+  node &replaceIDAttr(const std::string &name, const double &value) override;
 
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist,
   // the old node is deleted
-  Node &replaceIDAttr(const std::string &name, const uint64_t &value) override;
+  node &replaceIDAttr(const std::string &name, const uint64_t &value) override;
 
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist,
   // the old node is deleted
-  Node &replaceIDAttr(const std::string &name, const int64_t &value) override;
+  node &replaceIDAttr(const std::string &name, const int64_t &value) override;
 
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist,
   // the old node is deleted
-  Node &replaceIDAttr(const std::string &name, const bool &value) override;
+  node &replaceIDAttr(const std::string &name, const bool &value) override;
 
   // returns created dict node
   // replaces a node, adds a new node, if the node does not exist,
   // the old node is deleted
-  Node &replaceDictAttr(const std::string &name) override;
+  node &replaceDictAttr(const std::string &name) override;
 
   // returns created list node
   // replaces a node, adds a new node, if the node does not exist,
   // the old node is deleted
-  Node &replaceListAttr(const std::string &name) override;
+  node &replaceListAttr(const std::string &name) override;
 
   bool contains(const std::string &key) override;
 
-  std::unique_ptr<Node> erase(Node &node) override;
+  std::unique_ptr<node> erase(node &node) override;
 
   std::vector<std::string> &keys() override;
 };

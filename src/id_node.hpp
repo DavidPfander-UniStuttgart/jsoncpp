@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Node.hpp"
+#include "node.hpp"
 
 #include <string>
 #include <vector>
@@ -14,7 +14,7 @@ namespace json {
 
 // enum class InternalIDType {ID, DOUBLE, UINT, INT, BOOL};
 
-class IDNode : public Node {
+class id_node : public node {
 private:
   std::string value;
 
@@ -32,13 +32,13 @@ private:
   void setupInternalType();
 
 public:
-  IDNode();
+  id_node();
 
-  IDNode &operator=(const IDNode &right) = default;
+  id_node &operator=(const id_node &right) = default;
 
-  Node &operator=(const Node &right) override;
+  node &operator=(const node &right) override;
 
-  void parse(std::vector<Token> &stream) override;
+  void parse(std::vector<token> &stream) override;
 
   void serialize(std::ostream &outFile, size_t indentWidth) override;
 
@@ -64,7 +64,7 @@ public:
 
   size_t size() override;
 
-  Node *clone() override;
+  node *clone() override;
 };
 
 } // namespace json

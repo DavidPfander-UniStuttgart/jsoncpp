@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Node.hpp"
+#include "node.hpp"
 
 #include <memory>
 #include <string>
@@ -13,64 +13,64 @@
 
 namespace json {
 
-class ListNode : public Node {
+class list_node : public node {
 private:
-  std::vector<std::unique_ptr<Node>> list;
+  std::vector<std::unique_ptr<node>> list;
 
 public:
-  ListNode();
+  list_node();
 
-  ListNode(const ListNode &original);
+  list_node(const list_node &original);
 
-  ListNode &operator=(const ListNode &right);
+  list_node &operator=(const list_node &right);
 
-  Node &operator=(const Node &right) override;
+  node &operator=(const node &right) override;
 
-  void parse(std::vector<Token> &stream) override;
+  void parse(std::vector<token> &stream) override;
 
   void serialize(std::ostream &outFile, size_t indentWidth) override;
 
-  Node &operator[](const size_t index) override;
+  node &operator[](const size_t index) override;
 
   size_t size() override;
 
-  void addValue(std::unique_ptr<Node> node) override;
+  void addValue(std::unique_ptr<node> node) override;
 
-  std::unique_ptr<Node> removeValue(size_t index) override;
+  std::unique_ptr<node> removeValue(size_t index) override;
 
-  Node *clone() override;
-
-  // returns created dict node
-  Node &addDictValue() override;
+  node *clone() override;
 
   // returns created dict node
-  Node &addListValue() override;
+  node &addDictValue() override;
+
+  // returns created dict node
+  node &addListValue() override;
 
   // returns the list node to which the value was added
-  Node &addTextValue(const std::string &value) override;
+  node &addTextValue(const std::string &value) override;
 
   // returns the list node to which the value was added
   // cast internally to string, prevents the boolean overload from being used,
   // if the value is a
   // string literal
-  Node &addIdValue(const char *value) override;
+  node &addIdValue(const char *value) override;
 
   // returns the list node to which the value was added
-  Node &addIdValue(const std::string &value) override;
+  node &addIdValue(const std::string &value) override;
 
   // returns the list node to which the value was added
-  Node &addIdValue(const double &value) override;
+  node &addIdValue(const double &value) override;
 
   // returns the list node to which the value was added
-  Node &addIdValue(const uint64_t &value) override;
+  node &addIdValue(const uint64_t &value) override;
 
   // returns the list node to which the value was added
-  Node &addIdValue(const int64_t &value) override;
+  node &addIdValue(const int64_t &value) override;
 
   // returns the list node to which the value was added
-  Node &addIdValue(const bool &value) override;
+  node &addIdValue(const bool &value) override;
 
-  std::unique_ptr<Node> erase(Node &node) override;
+  std::unique_ptr<node> erase(node &node) override;
 };
 
 } // namespace json

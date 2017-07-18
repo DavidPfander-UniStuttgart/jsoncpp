@@ -10,10 +10,10 @@
 
 namespace json {
 
-json_exception::json_exception(Token &token, const std::string &message) {
+json_exception::json_exception(token &t, const std::string &message) {
   std::stringstream messageStream;
-  messageStream << "error: (line: " << token.lineNumber
-                << ", char: " << token.charNumber << ") at \"" << token.value
+  messageStream << "error: (line: " << t.lineNumber
+                << ", char: " << t.charNumber << ") at \"" << t.value
                 << "\": ";
   messageStream << message;
   this->message = messageStream.str();

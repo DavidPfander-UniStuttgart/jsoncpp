@@ -3,7 +3,7 @@
 // use, please see the copyright notice provided with SG++ or at
 // sgpp.sparsegrids.org
 
-#include "IDNode.hpp"
+#include "id_node.hpp"
 #include "json_exception.hpp"
 
 #include <fstream>
@@ -14,21 +14,21 @@
 
 namespace json {
 
-IDNode::IDNode()
+id_node::id_node()
     : value(),
       //        internalType(InternalIDType::ID),
       isDouble(false), doubleValue(0.0), isUnsigned(false), unsignedValue(0),
       isSigned(false), signedValue(0), isBool(false), boolValue(false) {}
 
-Node &IDNode::operator=(const Node &right) {
-  const IDNode &idNode = dynamic_cast<const IDNode &>(right);
+node &id_node::operator=(const node &right) {
+  const id_node &idNode = dynamic_cast<const id_node &>(right);
   this->operator=(idNode);
   return *this;
 }
 
-void IDNode::parse(std::vector<Token> &stream) {
+void id_node::parse(std::vector<token> &stream) {
   // create new text node
-  if (stream[0].type == TokenType::ID) {
+  if (stream[0].type == token_type::ID) {
     this->value = stream[0].value;
     stream.erase(stream.begin());
 
@@ -38,7 +38,7 @@ void IDNode::parse(std::vector<Token> &stream) {
   }
 }
 
-void IDNode::setupInternalType() {
+void id_node::setupInternalType() {
   //    this->internalType = InternalIDType::ID;
 
   // try validating as bool
@@ -97,15 +97,15 @@ void IDNode::setupInternalType() {
   }
 }
 
-std::string &IDNode::get() { return this->value; }
+std::string &id_node::get() { return this->value; }
 
-void IDNode::set(const std::string &value) {
+void id_node::set(const std::string &value) {
   this->value = value;
 
   this->setupInternalType();
 }
 
-double IDNode::getDouble() {
+double id_node::getDouble() {
   //    if (this->internalType == InternalIDType::DOUBLE) {
   if (this->isDouble) {
     return this->doubleValue;
@@ -114,7 +114,7 @@ double IDNode::getDouble() {
   }
 }
 
-void IDNode::setDouble(double numericValue) {
+void id_node::setDouble(double numericValue) {
   //    this->doubleValue = numericValue;
   //    this->internalType = InternalIDType::DOUBLE;
   std::stringstream stringstream;
@@ -123,7 +123,7 @@ void IDNode::setDouble(double numericValue) {
   this->setupInternalType();
 }
 
-uint64_t IDNode::getUInt() {
+uint64_t id_node::getUInt() {
   //    if (this->internalType == InternalIDType::UINT) {
   if (this->isUnsigned) {
     return this->unsignedValue;
@@ -132,7 +132,7 @@ uint64_t IDNode::getUInt() {
   }
 }
 
-void IDNode::setUInt(uint64_t uintValue) {
+void id_node::setUInt(uint64_t uintValue) {
   //    this->unsignedValue = uintValue;
   //    this->internalType = InternalIDType::UINT;
   std::stringstream stringstream;
@@ -141,7 +141,7 @@ void IDNode::setUInt(uint64_t uintValue) {
   this->setupInternalType();
 }
 
-int64_t IDNode::getInt() {
+int64_t id_node::getInt() {
   //    if (this->internalType == InternalIDType::INT) {
   if (this->isSigned) {
     return this->signedValue;
@@ -150,7 +150,7 @@ int64_t IDNode::getInt() {
   }
 }
 
-void IDNode::setInt(int64_t intValue) {
+void id_node::setInt(int64_t intValue) {
   //    this->unsignedValue = intValue;
   //    this->internalType = InternalIDType::INT;
   std::stringstream stringstream;
@@ -159,7 +159,7 @@ void IDNode::setInt(int64_t intValue) {
   this->setupInternalType();
 }
 
-bool IDNode::getBool() {
+bool id_node::getBool() {
   //    if (this->internalType == InternalIDType::BOOL) {
   if (this->isBool) {
     return this->boolValue;
@@ -168,7 +168,7 @@ bool IDNode::getBool() {
   }
 }
 
-void IDNode::setBool(bool boolValue) {
+void id_node::setBool(bool boolValue) {
   //    this->boolValue = boolValue;
   //    this->internalType = InternalIDType::BOOL;
   if (boolValue) {
@@ -180,14 +180,14 @@ void IDNode::setBool(bool boolValue) {
   this->setupInternalType();
 }
 
-void IDNode::serialize(std::ostream &outFile, size_t indentWidth) {
+void id_node::serialize(std::ostream &outFile, size_t indentWidth) {
   outFile << this->value;
 }
 
-size_t IDNode::size() { return 1; }
+size_t id_node::size() { return 1; }
 
-Node *IDNode::clone() {
-  IDNode *newNode = new IDNode(*this);
+node *id_node::clone() {
+  id_node *newNode = new id_node(*this);
   return newNode;
 }
 

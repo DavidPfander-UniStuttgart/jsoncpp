@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "DictNode.hpp"
-#include "Token.hpp"
+#include "dict_node.hpp"
+#include "token.hpp"
 
 #include <iostream>
 #include <map>
@@ -16,20 +16,20 @@
 
 namespace json {
 
-class JSON : public DictNode {
+class json : public dict_node {
 private:
   std::string fileName;
 
-  std::vector<Token> tokenize(const std::string &input);
+  std::vector<token> tokenize(const std::string &input);
 
 public:
-  explicit JSON(const std::string &fileName);
+  explicit json(const std::string &fileName);
 
-  JSON();
+  json();
 
-  JSON(const JSON &original);
+  json(const json &original);
 
-  virtual JSON *clone();
+  virtual json *clone();
 
   void clear();
 
@@ -39,7 +39,7 @@ public:
 
   void deserializeFromString(const std::string &content);
 
-  using DictNode::serialize;
+  using dict_node::serialize;
 };
 
 } // namespace json
