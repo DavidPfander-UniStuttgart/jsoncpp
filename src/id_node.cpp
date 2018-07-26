@@ -17,8 +17,14 @@ namespace json {
 id_node::id_node()
     : value(),
       //        internalType(InternalIDType::ID),
-      isDouble(false), doubleValue(0.0), isUnsigned(false), unsignedValue(0),
-      isSigned(false), signedValue(0), isBool(false), boolValue(false) {}
+      isDouble(false),
+      doubleValue(0.0),
+      isUnsigned(false),
+      unsignedValue(0),
+      isSigned(false),
+      signedValue(0),
+      isBool(false),
+      boolValue(false) {}
 
 node &id_node::operator=(const node &right) {
   const id_node &idNode = dynamic_cast<const id_node &>(right);
@@ -26,15 +32,16 @@ node &id_node::operator=(const node &right) {
   return *this;
 }
 
-void id_node::parse(std::vector<token> &stream) {
+void id_node::parse(std::vector<token>::iterator &stream_it,
+                    std::vector<token>::iterator &stream_end) {
   // create new text node
-  if (stream[0].type == token_type::ID) {
-    this->value = stream[0].value;
-    stream.erase(stream.begin());
+  if ((*stream_it).type == token_type::ID) {
+    this->value = (*stream_it).value;
+    stream_it++;
 
     this->setupInternalType();
   } else {
-    throw json_exception(stream[0], "expected id");
+    throw json_exception((*stream_it), "expected id");
   }
 }
 
@@ -180,9 +187,7 @@ void id_node::setBool(bool boolValue) {
   this->setupInternalType();
 }
 
-void id_node::serialize(std::ostream &outFile, size_t indentWidth) {
-  outFile << this->value;
-}
+void id_node::serialize(std::ostream &outFile, size_t indentWidth) { outFile << this->value; }
 
 size_t id_node::size() { return 1; }
 
@@ -191,4 +196,4 @@ node *id_node::clone() {
   return newNode;
 }
 
-} // namespace json
+}  // namespace json

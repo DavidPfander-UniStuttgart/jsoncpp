@@ -14,10 +14,10 @@
 namespace json {
 
 class list_node : public node {
-private:
+ private:
   std::vector<std::unique_ptr<node>> list;
 
-public:
+ public:
   list_node();
 
   list_node(const list_node &original);
@@ -26,7 +26,8 @@ public:
 
   node &operator=(const node &right) override;
 
-  void parse(std::vector<token> &stream) override;
+  void parse(std::vector<token>::iterator &stream_it,
+             std::vector<token>::iterator &stream_end) override;
 
   void serialize(std::ostream &outFile, size_t indentWidth) override;
 
@@ -73,4 +74,4 @@ public:
   std::unique_ptr<node> erase(node &node) override;
 };
 
-} // namespace json
+}  // namespace json

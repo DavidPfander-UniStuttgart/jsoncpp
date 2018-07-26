@@ -11,6 +11,7 @@
 #include "text_node.hpp"
 
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -52,27 +53,29 @@ node &dict_node::operator=(const node &right) {
   return *this;
 }
 
-void dict_node::parse(std::vector<token> &stream) {
+void dict_node::parse(std::vector<token>::iterator &stream_it,
+                      std::vector<token>::iterator &stream_end) {
   // special case for initial and final brace
-  if (stream[0].type != token_type::LBRACE) {
-    throw json_exception(stream[0], "expected \"{\"");
+  if ((*stream_it).type != token_type::LBRACE) {
+    throw json_exception((*stream_it), "expected \"{\"");
   }
 
-  stream.erase(stream.begin());
+  stream_it++;
 
   // special case for empty dict
-  if (stream[0].type != token_type::RBRACE) {
-    this->parseAttributes(stream);
+  if ((*stream_it).type != token_type::RBRACE) {
+    this->parseAttributes(stream_it, stream_end);
   }
 
-  if (stream[0].type != token_type::RBRACE) {
-    throw json_exception(stream[0], "expected \"}\"");
+  if ((*stream_it).type != token_type::RBRACE) {
+    throw json_exception((*stream_it), "expected \"}\"");
   }
 
-  stream.erase(stream.begin());
+  stream_it++;
 }
 
-void dict_node::parseAttributes(std::vector<token> &stream) {
+void dict_node::parseAttributes(std::vector<token>::iterator &stream_it,
+                                std::vector<token>::iterator &stream_end) {
   //  enum class Rules {
   //    NONE, TEXT_ASSIGN, ID_ASSIGN, LIST_ASSIGN, DICT_ASSIGN
   //  };
@@ -86,73 +89,76 @@ void dict_node::parseAttributes(std::vector<token> &stream) {
 
   std::string attributeName;
 
-  while (stream.size() > 0) {
+  // while (stream.size() > 0) {
+  // while (stream_it) {
+  while (stream_it != stream_end) {
     if (state == State::NEXT) {
-      if (stream[0].type == token_type::STRING) {
-        attributeName = stream[0].value;
+      if ((*stream_it).type == token_type::STRING) {
+        attributeName = (*stream_it).value;
         state = State::COLON;
-        stream.erase(stream.begin());
+        stream_it++;
       } else {
-        throw json_exception(stream[0], "expected attribute key");
+        throw json_exception((*stream_it), "expected attribute key");
       }
     } else if (state == State::COLON) {
-      if (stream[0].type == token_type::COLON) {
+      if ((*stream_it).type == token_type::COLON) {
         state = State::VALUE;
-        stream.erase(stream.begin());
+        stream_it++;
       } else {
-        throw json_exception(stream[0], "expected \":\"");
+        throw json_exception((*stream_it), "expected \":\"");
       }
     } else if (state == State::VALUE) {
-      if (stream[0].type == token_type::STRING) {
+      if ((*stream_it).type == token_type::STRING) {
         auto textNode = std::unique_ptr<text_node>(new text_node());
-        textNode->parse(stream);
+        textNode->parse(stream_it, stream_end);
         textNode->orderedKeyIndex = this->keyOrder.size();
         this->keyOrder.push_back(attributeName);
         textNode->parent = this;
         this->attributes[attributeName] = std::move(textNode);
         state = State::COMMAFINISH;
-      } else if (stream[0].type == token_type::ID) {
+      } else if ((*stream_it).type == token_type::ID) {
         auto idNode = std::unique_ptr<id_node>(new id_node());
-        idNode->parse(stream);
+        idNode->parse(stream_it, stream_end);
         idNode->orderedKeyIndex = this->keyOrder.size();
         this->keyOrder.push_back(attributeName);
         idNode->parent = this;
         this->attributes[attributeName] = std::move(idNode);
         state = State::COMMAFINISH;
-      } else if (stream[0].type == token_type::LBRACKET) {
+      } else if ((*stream_it).type == token_type::LBRACKET) {
         auto listNode = std::unique_ptr<list_node>(new list_node());
-        listNode->parse(stream);
+        listNode->parse(stream_it, stream_end);
         listNode->orderedKeyIndex = this->keyOrder.size();
         this->keyOrder.push_back(attributeName);
         listNode->parent = this;
         this->attributes[attributeName] = std::move(listNode);
         state = State::COMMAFINISH;
-      } else if (stream[0].type == token_type::LBRACE) {
+      } else if ((*stream_it).type == token_type::LBRACE) {
         auto attributeNode = std::unique_ptr<dict_node>(new dict_node());
-        attributeNode->parse(stream);
+        attributeNode->parse(stream_it, stream_end);
         attributeNode->orderedKeyIndex = this->keyOrder.size();
         this->keyOrder.push_back(attributeName);
         attributeNode->parent = this;
         this->attributes[attributeName] = std::move(attributeNode);
         state = State::COMMAFINISH;
       } else {
-        throw json_exception(stream[0], "expected attribute value type "
-                                        "(string, id, list or dict)");
+        throw json_exception((*stream_it),
+                             "expected attribute value type "
+                             "(string, id, list or dict)");
       }
     } else if (state == State::COMMAFINISH) {
-      if (stream[0].type == token_type::COMMA) {
-        stream.erase(stream.begin());
+      if ((*stream_it).type == token_type::COMMA) {
+        stream_it++;
         state = State::NEXT;
-      } else if (stream[0].type == token_type::RBRACE) {
+      } else if ((*stream_it).type == token_type::RBRACE) {
         return;
       } else {
-        throw json_exception(stream[0], "expected \",\" or \"}\"");
+        throw json_exception((*stream_it), "expected \",\" or \"}\"");
       }
     }
-  }
+  }  // namespace json
 
   throw json_exception("unexpected end-of-file");
-}
+}  // namespace json
 
 node &dict_node::operator[](const std::string &key) {
   if (this->attributes.count(key) == 0) {
@@ -177,8 +183,7 @@ void dict_node::serialize(std::ostream &outFile, size_t indentWidth) {
     }
 
     outFile << attrIndentation << "\"" << key << "\": ";
-    this->attributes[key]->serialize(outFile,
-                                     indentWidth + node::SERIALIZE_INDENT);
+    this->attributes[key]->serialize(outFile, indentWidth + node::SERIALIZE_INDENT);
   }
 
   outFile << std::endl << indentation << "}";
@@ -195,8 +200,7 @@ void dict_node::addAttribute(const std::string &name, std::unique_ptr<node> n) {
   if (n->parent != nullptr) {
     throw json_exception("addAttribute(): attribute was already added");
   } else if (this->attributes.count(name) > 0) {
-    throw json_exception(
-        "addAttribute(): attribute with same name already exists");
+    throw json_exception("addAttribute(): attribute with same name already exists");
   }
 
   n->parent = this;
@@ -230,8 +234,7 @@ std::unique_ptr<node> dict_node::removeAttribute(const std::string name) {
 }
 
 // returns the node to which the attribute was added
-node &dict_node::addTextAttr(const std::string &name,
-                             const std::string &value) {
+node &dict_node::addTextAttr(const std::string &name, const std::string &value) {
   auto textNode = std::unique_ptr<text_node>(new text_node());
   textNode->set(value);
   this->addAttribute(name, std::move(textNode));
@@ -289,7 +292,7 @@ node &dict_node::addIDAttr(const std::string &name, const bool &value) {
 // returns created dict node
 node &dict_node::addDictAttr(const std::string &name) {
   auto dictNode = std::unique_ptr<dict_node>(new dict_node());
-  auto &reference = *dictNode; // because dictNode will be invalidated
+  auto &reference = *dictNode;  // because dictNode will be invalidated
   this->addAttribute(name, std::move(dictNode));
   return reference;
 }
@@ -297,7 +300,7 @@ node &dict_node::addDictAttr(const std::string &name) {
 // returns created list node
 node &dict_node::addListAttr(const std::string &name) {
   auto listNode = std::unique_ptr<list_node>(new list_node());
-  auto &reference = *listNode; // because listNode will be invalidated
+  auto &reference = *listNode;  // because listNode will be invalidated
   this->addAttribute(name, std::move(listNode));
   return reference;
 }
@@ -305,8 +308,7 @@ node &dict_node::addListAttr(const std::string &name) {
 // returns the node to which the attribute was added
 // replaces a node, adds a new node, if the node does not exist,
 // the old node is deleted
-node &dict_node::replaceTextAttr(const std::string &name,
-                                 const std::string &value) {
+node &dict_node::replaceTextAttr(const std::string &name, const std::string &value) {
   if (this->attributes.count(name) > 0) {
     this->removeAttribute(name);
   }
@@ -318,8 +320,7 @@ node &dict_node::replaceTextAttr(const std::string &name,
 // returns the node to which the attribute was added
 // replaces a node, adds a new node, if the node does not exist,
 // the old node is deleted
-node &dict_node::replaceIDAttr(const std::string &name,
-                               const std::string &value) {
+node &dict_node::replaceIDAttr(const std::string &name, const std::string &value) {
   if (this->attributes.count(name) > 0) {
     this->removeAttribute(name);
   }
@@ -431,4 +432,4 @@ std::unique_ptr<node> dict_node::erase(node &n) {
 
 std::vector<std::string> &dict_node::keys() { return this->keyOrder; }
 
-} // namespace json
+}  // namespace json

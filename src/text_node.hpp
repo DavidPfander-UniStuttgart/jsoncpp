@@ -35,7 +35,8 @@ class text_node : public node {
 
   node& operator=(const node& right) override;
 
-  void parse(std::vector<token>& stream) override;
+  void parse(std::vector<token>::iterator& stream_it,
+             std::vector<token>::iterator& stream_end) override;
 
   void serialize(std::ostream& outFile, size_t indentWidth) override;
 

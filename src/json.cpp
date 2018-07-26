@@ -29,29 +29,26 @@ json::json(const std::string &fileName) : fileName(fileName) {
 
   std::string content;
   try {
-    content.assign(std::istreambuf_iterator<char>(file),
-                   std::istreambuf_iterator<char>());
+    content.assign(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
   } catch (std::ifstream::failure &e) {
     std::stringstream stream;
-    stream << "json error: could not successfully read file: " << fileName
-           << std::endl;
+    stream << "json error: could not successfully read file: " << fileName << std::endl;
     throw json_exception(stream.str());
   }
 
   file.close();
 
   std::vector<token> tokenStream = this->tokenize(content);
+  auto stream_it = tokenStream.begin();
+  auto stream_end = tokenStream.end();
+  this->parse(stream_it, stream_end);
 
-  this->parse(tokenStream);
-
-  if (tokenStream.size() != 0) {
+  if (stream_it != stream_end) {
     throw json_exception(tokenStream[0], "expected end-of-file");
   }
 }
 
-json::json(const json &original) : dict_node(original) {
-  this->fileName = original.fileName;
-}
+json::json(const json &original) : dict_node(original) { this->fileName = original.fileName; }
 
 std::vector<token> json::tokenize(const std::string &input) {
   std::vector<token> stream;
@@ -72,8 +69,7 @@ std::vector<token> json::tokenize(const std::string &input) {
 
     // skip whitespace while not tokenizing anything
     if (state == token_type::NONE) {
-      if (input[i] == ' ' || input[i] == '\r' || input[i] == '\n' ||
-          input[i] == '\t') {
+      if (input[i] == ' ' || input[i] == '\r' || input[i] == '\n' || input[i] == '\t') {
         continue;
       }
     }
@@ -138,18 +134,17 @@ std::vector<token> json::tokenize(const std::string &input) {
         t.value.push_back(input[i]);
       }
     } else if (state == token_type::ID) {
-      if (input[i] == '{' || input[i] == '}' || input[i] == '[' ||
-          input[i] == ']' || input[i] == ':' || input[i] == ',' ||
-          input[i] == ' ' || input[i] == '\t' || input[i] == '\r' ||
-          input[i] == '\n') {
+      if (input[i] == '{' || input[i] == '}' || input[i] == '[' || input[i] == ']' ||
+          input[i] == ':' || input[i] == ',' || input[i] == ' ' || input[i] == '\t' ||
+          input[i] == '\r' || input[i] == '\n') {
         stream.push_back(t);
         state = token_type::NONE;
 
         if (input[i] == '\n') {
-          lineNumber -= 1; // as the char will be reprocessed
+          lineNumber -= 1;  // as the char will be reprocessed
         }
 
-        i -= 1; // revert by one
+        i -= 1;  // revert by one
 
       } else {
         t.value.push_back(input[i]);
@@ -161,9 +156,8 @@ std::vector<token> json::tokenize(const std::string &input) {
         state = token_type::MULTILINECOMMENT;
       } else {
         std::stringstream messageStream;
-        messageStream
-            << "error: (line: " << lineNumber << ", char: " << (charNumber - 1)
-            << "): expected a single- or multiline comment after \"/\"";
+        messageStream << "error: (line: " << lineNumber << ", char: " << (charNumber - 1)
+                      << "): expected a single- or multiline comment after \"/\"";
         throw json_exception(messageStream.str());
       }
     } else if (state == token_type::SINGLELINE) {
@@ -180,8 +174,7 @@ std::vector<token> json::tokenize(const std::string &input) {
       }
     } else {
       std::stringstream messageStream;
-      messageStream << "error: (line: " << lineNumber
-                    << ", char: " << (charNumber - 1)
+      messageStream << "error: (line: " << lineNumber << ", char: " << (charNumber - 1)
                     << "): illegal parser state, this might be a bug";
       throw json_exception(messageStream.str());
     }
@@ -203,7 +196,9 @@ void json::deserialize(std::string content) {
   this->clear();
   std::vector<token> tokenStream = this->tokenize(content);
 
-  this->parse(tokenStream);
+  auto stream_it = tokenStream.begin();
+  auto stream_end = tokenStream.end();
+  this->parse(stream_it, stream_end);
 
   if (tokenStream.size() != 0) {
     throw json_exception(tokenStream[0], "expected end-of-file");
@@ -225,11 +220,13 @@ void json::deserializeFromString(const std::string &content) {
   this->clear();
   std::vector<token> tokenStream = this->tokenize(content);
 
-  this->parse(tokenStream);
+  auto stream_it = tokenStream.begin();
+  auto stream_end = tokenStream.end();
+  this->parse(stream_it, stream_end);
 
   if (tokenStream.size() != 0) {
     throw json_exception(tokenStream[0], "expected end-of-file");
   }
 }
 
-} // namespace json
+}  // namespace json

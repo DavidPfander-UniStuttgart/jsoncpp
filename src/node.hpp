@@ -14,10 +14,10 @@
 namespace json {
 
 class node {
-protected:
+ protected:
   static const int SERIALIZE_INDENT = 3;
 
-public:
+ public:
   // only relevant if the parent is a dict_node, managed by the dict_node
   size_t orderedKeyIndex;
 
@@ -30,7 +30,8 @@ public:
 
   virtual node &operator=(const node &right);
 
-  virtual void parse(std::vector<token> &stream) = 0;
+  virtual void parse(std::vector<token>::iterator &stream_it,
+                     std::vector<token>::iterator &stream_end) = 0;
 
   virtual void serialize(std::ostream &outFile, size_t indentWidth) = 0;
 
@@ -105,14 +106,12 @@ public:
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist, the old node
   // is deleted
-  virtual node &replaceTextAttr(const std::string &name,
-                                const std::string &value);
+  virtual node &replaceTextAttr(const std::string &name, const std::string &value);
 
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist, the old node
   // is deleted
-  virtual node &replaceIDAttr(const std::string &name,
-                              const std::string &value);
+  virtual node &replaceIDAttr(const std::string &name, const std::string &value);
 
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist, the old node
@@ -191,6 +190,6 @@ public:
   virtual std::vector<std::string> &keys();
 };
 
-} // namespace json
+}  // namespace json
 
 std::ostream &operator<<(std::ostream &stream, json::node &n);

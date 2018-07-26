@@ -6,8 +6,8 @@
 #include "list_node.hpp"
 #include "dict_node.hpp"
 #include "id_node.hpp"
-#include "text_node.hpp"
 #include "json_exception.hpp"
+#include "text_node.hpp"
 
 #include <fstream>
 #include <string>
@@ -48,64 +48,66 @@ node &list_node::operator=(const node &right) {
   return *this;
 }
 
-void list_node::parse(std::vector<token> &stream) {
+void list_node::parse(std::vector<token>::iterator &stream_it,
+                      std::vector<token>::iterator &stream_end) {
   list.clear();
 
   enum class State { ITEMVALUE, NEXT };
 
-  if (stream[0].type != token_type::LBRACKET) {
+  if ((*stream_it).type != token_type::LBRACKET) {
     throw json_exception("expected \"[\"");
   }
 
-  stream.erase(stream.begin());
+  // stream_it++;
+  stream_it++;
 
   // special case for empty list
-  if (stream[0].type == token_type::RBRACKET) {
-    stream.erase(stream.begin());
+  if ((*stream_it).type == token_type::RBRACKET) {
+    // stream_it++;
+    stream_it++;
     return;
   }
 
   State state = State::ITEMVALUE;
 
-  while (stream.size() > 0) {
+  while (stream_it != stream_end) {
     if (state == State::ITEMVALUE) {
-      if (stream[0].type == token_type::STRING) {
+      if ((*stream_it).type == token_type::STRING) {
         auto textNode = std::unique_ptr<text_node>(new text_node());
-        textNode->parse(stream);
+        textNode->parse(stream_it, stream_end);
         textNode->parent = this;
         this->list.push_back(std::move(textNode));
         state = State::NEXT;
-      } else if (stream[0].type == token_type::ID) {
+      } else if ((*stream_it).type == token_type::ID) {
         auto idNode = std::unique_ptr<id_node>(new id_node());
-        idNode->parse(stream);
+        idNode->parse(stream_it, stream_end);
         idNode->parent = this;
         this->list.push_back(std::move(idNode));
         state = State::NEXT;
-      } else if (stream[0].type == token_type::LBRACKET) {
+      } else if ((*stream_it).type == token_type::LBRACKET) {
         auto listNode = std::unique_ptr<list_node>(new list_node());
-        listNode->parse(stream);
+        listNode->parse(stream_it, stream_end);
         listNode->parent = this;
         this->list.push_back(std::move(listNode));
         state = State::NEXT;
-      } else if (stream[0].type == token_type::LBRACE) {
+      } else if ((*stream_it).type == token_type::LBRACE) {
         auto dictNode = std::unique_ptr<dict_node>(new dict_node());
-        dictNode->parse(stream);
+        dictNode->parse(stream_it, stream_end);
         dictNode->parent = this;
         this->list.push_back(std::move(dictNode));
         state = State::NEXT;
       } else {
-        throw json_exception(
-            stream[0], "expected list value type (string, id, list or dict)");
+        throw json_exception((*stream_it), "expected list value type (string, id, list or dict)");
       }
     } else if (state == State::NEXT) {
-      if (stream[0].type == token_type::COMMA) {
-        stream.erase(stream.begin());
+      if ((*stream_it).type == token_type::COMMA) {
+        stream_it++;
         state = State::ITEMVALUE;
-      } else if (stream[0].type == token_type::RBRACKET) {
-        stream.erase(stream.begin());
+      } else if ((*stream_it).type == token_type::RBRACKET) {
+        stream_it++;
         return;
       } else {
-        throw json_exception(stream[0], "expected \",\" or \"]\"");
+        throw json_exception((*stream_it), "expected \",\" or \"]\"");
       }
     }
   }
@@ -179,9 +181,7 @@ node &list_node::addIdValue(const std::string &value) {
 // cast internally to string, prevents the boolean overload from being used, if
 // the value is a
 // string literal
-node &list_node::addIdValue(const char *value) {
-  return this->addIdValue(std::string(value));
-}
+node &list_node::addIdValue(const char *value) { return this->addIdValue(std::string(value)); }
 
 // returns the list node to which the value was added
 node &list_node::addIdValue(const double &value) {
@@ -218,7 +218,7 @@ node &list_node::addIdValue(const bool &value) {
 // returns created dict node
 node &list_node::addDictValue() {
   auto dictNode = std::unique_ptr<dict_node>(new dict_node());
-  auto &reference = *dictNode; // because dictNode will be invalidated
+  auto &reference = *dictNode;  // because dictNode will be invalidated
   this->addValue(std::move(dictNode));
   return reference;
 }
@@ -226,7 +226,7 @@ node &list_node::addDictValue() {
 // returns created dict node
 node &list_node::addListValue() {
   auto listNode = std::unique_ptr<list_node>(new list_node());
-  auto &reference = *listNode; // because listNode will be invalidated
+  auto &reference = *listNode;  // because listNode will be invalidated
   this->addValue(std::move(listNode));
   return reference;
 }
@@ -244,4 +244,4 @@ std::unique_ptr<node> list_node::erase(node &n) {
   throw json_exception("erase(node): node not found");
 }
 
-} // namespace json
+}  // namespace json

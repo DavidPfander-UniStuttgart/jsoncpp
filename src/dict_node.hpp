@@ -15,12 +15,12 @@
 namespace json {
 
 class dict_node : public node {
-protected:
+ protected:
   std::map<std::string, std::unique_ptr<node>> attributes;
 
   std::vector<std::string> keyOrder;
 
-public:
+ public:
   dict_node();
 
   dict_node(const dict_node &original);
@@ -29,9 +29,11 @@ public:
 
   node &operator=(const node &right) override;
 
-  void parse(std::vector<token> &stream) override;
+  void parse(std::vector<token>::iterator &stream_it,
+             std::vector<token>::iterator &stream_end) override;
 
-  void parseAttributes(std::vector<token> &stream);
+  void parseAttributes(std::vector<token>::iterator &stream_it,
+                       std::vector<token>::iterator &stream_end);
 
   void serialize(std::ostream &outFile, size_t indentWidth) override;
 
@@ -41,8 +43,7 @@ public:
 
   node *clone() override;
 
-  void addAttribute(const std::string &name,
-                    std::unique_ptr<node> node) override;
+  void addAttribute(const std::string &name, std::unique_ptr<node> node) override;
 
   std::unique_ptr<node> removeAttribute(const std::string name) override;
 
@@ -79,14 +80,12 @@ public:
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist,
   // the old node is deleted
-  node &replaceTextAttr(const std::string &name,
-                        const std::string &value) override;
+  node &replaceTextAttr(const std::string &name, const std::string &value) override;
 
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist,
   // the old node is deleted
-  node &replaceIDAttr(const std::string &name,
-                      const std::string &value) override;
+  node &replaceIDAttr(const std::string &name, const std::string &value) override;
 
   // returns the node to which the attribute was added
   // replaces a node, adds a new node, if the node does not exist,
@@ -133,4 +132,4 @@ public:
   std::vector<std::string> &keys() override;
 };
 
-} // namespace json
+}  // namespace json

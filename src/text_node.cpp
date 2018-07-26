@@ -3,8 +3,8 @@
 // use, please see the copyright notice provided with SG++ or at
 // sgpp.sparsegrids.org
 
-#include "json_exception.hpp"
 #include "text_node.hpp"
+#include "json_exception.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -14,8 +14,14 @@
 namespace json {
 
 text_node::text_node()
-    : value(), isDouble(false), doubleValue(0.0), isUnsigned(false),
-      unsignedValue(0), isSigned(false), signedValue(0), isBool(false),
+    : value(),
+      isDouble(false),
+      doubleValue(0.0),
+      isUnsigned(false),
+      unsignedValue(0),
+      isSigned(false),
+      signedValue(0),
+      isBool(false),
       boolValue(false) {}
 
 node &text_node::operator=(const node &right) {
@@ -113,11 +119,12 @@ void text_node::setupInternalType() {
   }
 }
 
-void text_node::parse(std::vector<token> &stream) {
+void text_node::parse(std::vector<token>::iterator &stream_it,
+                      std::vector<token>::iterator &stream_end) {
   // create new text node
-  if (stream[0].type == token_type::STRING) {
-    this->value = stream[0].value;
-    stream.erase(stream.begin());
+  if ((*stream_it).type == token_type::STRING) {
+    this->value = (*stream_it).value;
+    stream_it++;
 
     this->setupInternalType();
   } else {
@@ -218,4 +225,4 @@ node *text_node::clone() {
   return newNode;
 }
 
-} // namespace json
+}  // namespace json

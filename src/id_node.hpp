@@ -15,13 +15,13 @@ namespace json {
 // enum class InternalIDType {ID, DOUBLE, UINT, INT, BOOL};
 
 class id_node : public node {
-private:
+ private:
   std::string value;
 
   //  bool isNumber;
   //  InternalIDType internalType;
   bool isDouble;
-  double doubleValue; // only used for number types
+  double doubleValue;  // only used for number types
   bool isUnsigned;
   uint64_t unsignedValue;
   bool isSigned;
@@ -31,14 +31,15 @@ private:
 
   void setupInternalType();
 
-public:
+ public:
   id_node();
 
   id_node &operator=(const id_node &right) = default;
 
   node &operator=(const node &right) override;
 
-  void parse(std::vector<token> &stream) override;
+  void parse(std::vector<token>::iterator &stream_it,
+             std::vector<token>::iterator &stream_end) override;
 
   void serialize(std::ostream &outFile, size_t indentWidth) override;
 
@@ -67,4 +68,4 @@ public:
   node *clone() override;
 };
 
-} // namespace json
+}  // namespace json
